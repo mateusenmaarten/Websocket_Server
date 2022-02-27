@@ -1,4 +1,6 @@
-﻿using CAH.Backend.Interfaces;
+﻿using CAH.Backend.Classes;
+using CAH.Backend.Factories;
+using CAH.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Timers;
@@ -18,15 +20,42 @@ namespace Websocket_Server
             {
                 playerNames += player.Name + " ";
             }
-            Sessions.Broadcast($"Aantal spelers: {ServerManager.Instance.ClientCounter} {playerNames}"); //Lijst wordt niet bijgehouden
+            Sessions.Broadcast($"Aantal spelers: {ServerManager.Instance.ClientCounter} {playerNames}");
+
+            if (ServerManager.Instance.GameIsFull)
+            {
+                Sessions.Broadcast($"Het spel gaat beginnen!");
+                CreateGame();
+            }
+        }
+
+        void CreateGame()
+        {
+            GameFactory gameFactory = new GameFactory();
+            Game game = gameFactory.CreateGame(CreateGamePlayers(ServerManager.Instance.players));
+            GameManager gameManager = game.GameManager;
+
+            gameManager.StartGame();
         }
 
         void CreatePlayer(string playerName)
         {
-                Player p = new Player();
-                p.Name = playerName; //Input client name
-                p.ID = Guid.NewGuid();
-                ServerManager.Instance.players.Add(p);
+            Player p = new Player();
+            p.Name = playerName; //Input client name
+            p.ID = Guid.NewGuid();
+            ServerManager.Instance.players.Add(p);
+        }
+
+        List<IGamePlayer> CreateGamePlayers(List<IPlayer> players)
+        {
+            List<IGamePlayer> _gamePlayers = new List<IGamePlayer>();
+            foreach (var player in ServerManager.Instance.players)
+            {
+                GamePlayer gp = new GamePlayer(player);
+                gp.PlayerState = new GamePlayerState();
+                _gamePlayers.Add(gp);
+            }
+            return _gamePlayers;
         }
     }
 }
