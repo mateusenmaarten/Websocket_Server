@@ -1,5 +1,7 @@
-﻿using CAH.Backend.Interfaces;
+﻿using CAH.Backend.Classes;
+using CAH.Backend.Interfaces;
 using System.Collections.Generic;
+using WebSocketSharp;
 
 namespace Websocket_Server
 {
@@ -7,6 +9,7 @@ namespace Websocket_Server
     {
         public int ClientCounter { get; set; }
         public List<IPlayer> players = new List<IPlayer>();
+        public Dictionary<WebSocket, GamePlayer> GamePlayersWithTheirWebSocket = new Dictionary<WebSocket, GamePlayer>();
         public bool GameIsFull 
         { 
             get 

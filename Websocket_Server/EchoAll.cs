@@ -14,36 +14,64 @@ namespace Websocket_Server
         string playerNames = "";
         protected override void OnMessage(MessageEventArgs e)
         {
-            ServerManager.Instance.ClientCounter += 1;
-            CreatePlayer(e.Data);
+            WebSocket websocket = Context.WebSocket;
+
+            if (e.Data != null && !ServerManager.Instance.GameIsFull)
+            {
+                ServerManager.Instance.ClientCounter += 1;
+                Player p = CreatePlayer(e.Data);
+                p.ID = Guid.Parse(ID);
+                Send($"Welkom {p.Name} (ID: {p.ID})");
+            }
+            
             foreach (var player in ServerManager.Instance.players)
             {
                 playerNames += player.Name + " ";
             }
+
             Sessions.Broadcast($"Aantal spelers: {ServerManager.Instance.ClientCounter} {playerNames}");
+            GamePlayer gameplayer = new GamePlayer(ServerManager.Instance.players[ServerManager.Instance.ClientCounter -1]);
+            
+            ServerManager.Instance.GamePlayersWithTheirWebSocket.Add(websocket, gameplayer);
 
             if (ServerManager.Instance.GameIsFull)
             {
+                GameManager gameManager = CreateGame();
+
                 Sessions.Broadcast($"Het spel gaat beginnen!");
-                CreateGame();
+                Sessions.Broadcast(gameManager.GetCurrentGameState().ToString());
+
+                foreach (var player in ServerManager.Instance.GamePlayersWithTheirWebSocket)
+                {
+                    
+                    gameManager.DrawOpeningHand(player.Value);
+                    string cardsInHand = "";
+                    foreach (var card in player.Value.PlayerState.Hand.CardsInHand)
+                    {
+                        cardsInHand += $"{card.Text}\n";
+                    }
+                    player.Key.Send($"{player.Value.Player.Name}, dit zijn uw kaarten:\n{cardsInHand}"); 
+                }
             }
         }
 
-        void CreateGame()
+        GameManager CreateGame()
         {
             GameFactory gameFactory = new GameFactory();
             Game game = gameFactory.CreateGame(CreateGamePlayers(ServerManager.Instance.players));
             GameManager gameManager = game.GameManager;
 
             gameManager.StartGame();
+            return gameManager;
         }
 
-        void CreatePlayer(string playerName)
+        Player CreatePlayer(string playerName)
         {
             Player p = new Player();
             p.Name = playerName; //Input client name
-            p.ID = Guid.NewGuid();
+            //p.ID = Guid.NewGuid();
             ServerManager.Instance.players.Add(p);
+            return p;
         }
 
         List<IGamePlayer> CreateGamePlayers(List<IPlayer> players)
