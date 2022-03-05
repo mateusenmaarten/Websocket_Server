@@ -11,6 +11,41 @@ namespace Websocket_Server
 {
     public class CardsAgainstHumanity : WebSocketBehavior
     {
+        private string DisplayWelcomeMessage(Player p)
+        {
+            string welcomeString = Environment.NewLine
+                + "CARDS AGAINST HUMANITY\n"
+                + "-----------------------\n"
+                + $"Welkom {p.Name} (ID: {p.ID})\n";
+
+            return welcomeString;
+        }
+        private string ShowPlayersInGame(Dictionary<WebSocket, GamePlayer> gamePlayers)
+        {
+            string playersInGame = $"Spelers:\n";
+            foreach (var gp in gamePlayers)
+            {
+                playersInGame += $" -> { gp.Value.Player.Name}\n";
+            }
+
+            return playersInGame;
+        }
+        private void DisplayOpeningHands(GameManager gm, Dictionary<WebSocket, GamePlayer> gamePlayers)
+        {
+            foreach (var gp in gamePlayers)
+            {
+                string openingHand = $"Het spel gaat beginnen!\n";
+                openingHand += $"{gp.Value.Player.Name}, dit zijn uw kaarten:\n\n";
+                string cardsInHand = "";
+                foreach (var card in gp.Value.PlayerState.Hand.CardsInHand)
+                {
+                    cardsInHand += $" ->{card.Text}\n";
+                }
+                openingHand += cardsInHand;
+                gp.Key.Send(openingHand);
+            }
+        }
+        
         protected override void OnMessage(MessageEventArgs e)
         {
 
@@ -21,8 +56,8 @@ namespace Websocket_Server
                 ServerManager.Instance.ClientCounter += 1;
 
                 Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
-                Send(Environment.NewLine + "CARDS AGAINST HUMANITY");
-                Send($"Welkom {playerWaitingForGame.Name} (ID: {playerWaitingForGame.ID})");
+                
+                Send(DisplayWelcomeMessage(playerWaitingForGame));
             }
 
             Sessions.Broadcast($"Wachten op spelers ({ServerManager.Instance.ClientCounter}/{ServerManager.Instance.NumberOfPlayersForGame})");
@@ -31,32 +66,12 @@ namespace Websocket_Server
             {
                 GameManager gameManager = CreateGame();
 
-                Sessions.Broadcast(Environment.NewLine + "Het spel gaat beginnen!");
-                Sessions.Broadcast(gameManager.GetCurrentGameState().ToString());
+                Sessions.Broadcast(ShowPlayersInGame(ServerManager.Instance.GamePlayersWithTheirWebSocket));
 
-                foreach (var player in ServerManager.Instance.GamePlayersWithTheirWebSocket)
-                {
-                    string cardsInHand = "";
-                    foreach (var card in player.Value.PlayerState.Hand.CardsInHand)
-                    {
-                        cardsInHand += $"{card.Text}\n";
-                    }
-                    player.Key.Send($"{player.Value.Player.Name}, dit zijn uw kaarten:\n{cardsInHand}"); 
-                }
+                DisplayOpeningHands(gameManager, ServerManager.Instance.GamePlayersWithTheirWebSocket);
+
                 // Create new instance of ServerManager singleton? 
             }
-        }
-
-        GameManager CreateGame()
-        {
-            GameFactory gameFactory = new GameFactory();
-            List<IGamePlayer> gamePlayers = CreateGamePlayers(ServerManager.Instance.PlayersWaitingForGame);
-
-            Game game = gameFactory.CreateGame(gamePlayers);
-            GameManager gameManager = game.GameManager;
-
-            gameManager.StartGame();
-            return gameManager;
         }
 
         Player CreatePlayer(string playerName, WebSocket websocket)
@@ -70,7 +85,6 @@ namespace Websocket_Server
 
             return playerWaitingForGame;
         }
-
         List<IGamePlayer> CreateGamePlayers(Dictionary<WebSocket,IPlayer> players)
         {
             List<IGamePlayer> _gamePlayers = new List<IGamePlayer>();
@@ -82,6 +96,17 @@ namespace Websocket_Server
                 ServerManager.Instance.GamePlayersWithTheirWebSocket.Add(player.Key, gp);
             }
             return _gamePlayers;
+        }
+        GameManager CreateGame()
+        {
+            GameFactory gameFactory = new GameFactory();
+            List<IGamePlayer> gamePlayers = CreateGamePlayers(ServerManager.Instance.PlayersWaitingForGame);
+
+            Game game = gameFactory.CreateGame(gamePlayers);
+            GameManager gameManager = game.GameManager;
+
+            gameManager.StartGame();
+            return gameManager;
         }
     }
 }
