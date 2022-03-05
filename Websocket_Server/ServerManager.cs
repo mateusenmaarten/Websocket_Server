@@ -8,14 +8,17 @@ namespace Websocket_Server
     public sealed class ServerManager
     {
         public int ClientCounter { get; set; }
-        public List<IPlayer> players = new List<IPlayer>();
+        public Dictionary<WebSocket, IPlayer> PlayersWaitingForGame = new Dictionary<WebSocket, IPlayer>();
         public Dictionary<WebSocket, GamePlayer> GamePlayersWithTheirWebSocket = new Dictionary<WebSocket, GamePlayer>();
+
+        public int NumberOfPlayersForGame
+        {
+            get { return 3;}
+            set { NumberOfPlayersForGame = value;}
+        }
         public bool GameIsFull 
         { 
-            get 
-            {
-                return ClientCounter == 3 ? true : false;
-            } 
+            get { return ClientCounter == NumberOfPlayersForGame ? true : false;} 
         }
 
         private ServerManager() { }
