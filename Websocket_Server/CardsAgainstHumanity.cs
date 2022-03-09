@@ -49,6 +49,18 @@ namespace Websocket_Server
         protected override void OnMessage(MessageEventArgs e)
         {
 
+            // incoming message = new game
+            // 1. new server manager
+            // 2. send url to requesting player
+
+
+            // incoming message = join game with id
+            // 1. resolve existing server manager
+            // 2. send url to requesting player
+
+            // server manager has own websocket with it' own url for communicating with players
+
+
             WebSocket websocket = Context.WebSocket;
 
             if (e.Data != null && !ServerManager.Instance.GameIsFull)
@@ -70,7 +82,8 @@ namespace Websocket_Server
 
                 DisplayOpeningHands(gameManager, ServerManager.Instance.GamePlayersWithTheirWebSocket);
 
-                // Create new instance of ServerManager singleton? 
+                gameManager.StartNewTurn();
+
             }
         }
 

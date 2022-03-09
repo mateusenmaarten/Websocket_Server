@@ -5,6 +5,10 @@ using WebSocketSharp;
 
 namespace Websocket_Server
 {
+    
+    // GameServer -> managed x spelers in 1 spel - bevat GameManager + spelers met websocket
+    //     deze serialized de acties van/naar gameManager met messages
+
     public sealed class ServerManager
     {
         public int ClientCounter { get; set; }
