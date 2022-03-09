@@ -11,12 +11,11 @@ namespace Websocket_Server
         List<string> activeGameServers = new List<string>();
         protected override void OnMessage(MessageEventArgs e)
         {
-            List<int> validOptions = new List<int>() { (int)GameOption.NewGame, (int)GameOption.JoinGame };
+            List<GameOption> validOptions = new List<GameOption>() { GameOption.NewGame, GameOption.JoinGame };
+
+            GameOption chosenOptionEnum = Enum.Parse<GameOption>(e.Data);
             
-            int.TryParse(e.Data, out int chosenOption);
-            GameOption chosenOptionEnum = (GameOption)Enum.ToObject(typeof(GameOption), chosenOption);
-            
-            bool chosenOptionIsValid = validOptions.Contains(chosenOption) ? true : false;
+            bool chosenOptionIsValid = validOptions.Contains(chosenOptionEnum);
 
             if (chosenOptionIsValid)
             {
