@@ -8,7 +8,7 @@ namespace Websocket_Server
     public class GameManagerServer : WebSocketBehavior
     {
         const string baseGameServerUrl = "ws://localhost:4200/CardsAgainstHumanity";
-        List<string> activeGameServers = new List<string>();
+
         protected override void OnMessage(MessageEventArgs e)
         {
             List<GameOption> validOptions = new List<GameOption>() { GameOption.NewGame, GameOption.JoinGame };
@@ -23,7 +23,6 @@ namespace Websocket_Server
                 {
                     case GameOption.NewGame:
                         string gameServerUrl = CreateNewServerForGame();
-                        AddServerToActiveServersList(gameServerUrl);
                         Send(gameServerUrl);
                         break;
                     case GameOption.JoinGame:
@@ -48,30 +47,17 @@ namespace Websocket_Server
 
         public string CreateNewServerForGame()
         {
-            string gameServerID = Guid.NewGuid().ToString();
-            WebSocketServer wss = new WebSocketServer(baseGameServerUrl);
-            wss.AddWebSocketService<GameServer>($"/{gameServerID}");
-            wss.Start();
-             
-            return baseGameServerUrl + $"/{gameServerID}";
+            GameServer gameServer = new GameServer();
+            return gameServer.URL;
         }
         private void SendListOfActiveServerUrls()
         {
-            foreach (var gameServerUrl in activeGameServers)
+            foreach (var gameServerUrl in Lobby.Instance.ActiveGameServers)
             {
                 Send(gameServerUrl);
             }
         }
 
-        public void AddServerToActiveServersList(string gameServerUrl)
-        {
-            if (activeGameServers.Contains(gameServerUrl))
-            {
-                return;
-            }
-
-            activeGameServers.Add(gameServerUrl);
-        }
         public void SendPlayerToRequestedGame(Guid id)
         {
             Send($"ws://localhost:4200/CardsAgainstHumanity/{id}");
