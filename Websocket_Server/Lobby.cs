@@ -11,7 +11,6 @@ namespace Websocket_Server
 {
     public class Lobby
     {
-        public List<string> ActiveGameServers { get; set; }
         public Dictionary<GameServer, IPlayer> GameServerWithPlayers = new Dictionary<GameServer, IPlayer>();
 
         public int NumberOfPlayersForGame
@@ -19,6 +18,7 @@ namespace Websocket_Server
             get { return 3; }
             set { NumberOfPlayersForGame = value; }
         }
+
         public bool GameIsFull //Moet per server worden bekeken
         {
             get { return GameServerWithPlayers.Values.Count == NumberOfPlayersForGame ? true : false; }

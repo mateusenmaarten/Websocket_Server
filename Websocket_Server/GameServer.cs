@@ -22,8 +22,8 @@ namespace Websocket_Server
           WebSocketServer wss = new WebSocketServer(baseGameServerUrl);
           wss.AddWebSocketService<GameServer>($"/{GameServerID}");
           wss.Start();
-          Lobby.Instance.ActiveGameServers.Add(this.URL);
         }
+
         public Guid GameServerID { get; set; }
         public string URL { get { return baseGameServerUrl + $"/{GameServerID}"; } }
 
@@ -49,7 +49,7 @@ namespace Websocket_Server
 
             return playersInGame;
         }
-        private void DisplayOpeningHands(GameManager gm, Dictionary<WebSocket, GamePlayer> gamePlayers)
+        private void DisplayOpeningHands(GameManager gm, Dictionary<WebSocket, IGamePlayer> gamePlayers)
         {
             foreach (var gp in gamePlayers)
             {
@@ -69,14 +69,14 @@ namespace Websocket_Server
         {
             WebSocket websocket = Context.WebSocket;
 
-            if (e.Data != null && !ServerManager.Instance.GameIsFull)
+            if (e.Data != null)
             {
                 Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
                 Lobby.Instance.GameServerWithPlayers.Add(this, playerWaitingForGame);
                 Send(DisplayWelcomeMessage(playerWaitingForGame));
             }
 
-            Sessions.Broadcast($"Wachten op spelers ({ServerManager.Instance.ClientCounter}/{ServerManager.Instance.NumberOfPlayersForGame})");
+            Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
 
             if (Lobby.Instance.GameIsFull)
             {
@@ -84,7 +84,7 @@ namespace Websocket_Server
 
                 Sessions.Broadcast(ShowPlayersInGame(Lobby.Instance.GameServerWithPlayers));
 
-                DisplayOpeningHands(gameManager, ServerManager.Instance.GamePlayersWithTheirWebSocket);
+                DisplayOpeningHands(gameManager, _gamePlayers);
 
                 gameManager.StartNewTurn();
 

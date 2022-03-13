@@ -52,9 +52,9 @@ namespace Websocket_Server
         }
         private void SendListOfActiveServerUrls()
         {
-            foreach (var gameServerUrl in Lobby.Instance.ActiveGameServers)
+            foreach (var gameServer in Lobby.Instance.GameServerWithPlayers.Keys)
             {
-                Send(gameServerUrl);
+                Send(gameServer.URL);
             }
         }
 
