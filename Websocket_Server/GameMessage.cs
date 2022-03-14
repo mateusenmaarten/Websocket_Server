@@ -1,17 +1,18 @@
 ﻿using CAH.Backend.Classes;
+using CAH.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Websocket_Server
 {
     public abstract class GameMessage
     {
+        public abstract string Message{ get; }
         public abstract string MessageType { get; }
-
-
         public abstract MessageRouting Routing { get; }
 
     }
@@ -27,11 +28,11 @@ namespace Websocket_Server
 
     public abstract class SinglePlayerMessage : GameMessage
     {
-        public SinglePlayerMessage(CAH.Backend.Classes.IGamePlayer player) : base()
+        public SinglePlayerMessage(IPlayer player) : base()
         {
             this.Player = player;
         }
-        public CAH.Backend.Classes.IGamePlayer Player { get; }
+        public IPlayer Player { get; }
 
     }
 
@@ -55,6 +56,30 @@ namespace Websocket_Server
         public override MessageRouting Routing => MessageRouting.PlayerToServer;
     }
 
+    public class WelcomeMessage : SinglePlayerMessage
+    {
+        public WelcomeMessage(IPlayer player) : base(player)
+        {
+            
+        }
+
+        public override string MessageType => nameof(WelcomeMessage);
+
+        public override MessageRouting Routing => MessageRouting.ServerToPlayer;
+
+        public override string Message 
+        {
+            get
+            {
+                string welcomeString = Environment.NewLine
+                + "CARDS AGAINST HUMANITY\n"
+                + "-----------------------\n"
+                + $"Welkom {Player.Name} (ID: {Player.ID})\n";
+
+                return welcomeString;
+            }
+        }
+    }
 
     public class PlayWhiteCardMessage : SinglePlayerMessage
     {

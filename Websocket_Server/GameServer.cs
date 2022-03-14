@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -27,15 +28,7 @@ namespace Websocket_Server
         public Guid GameServerID { get; set; }
         public string URL { get { return baseGameServerUrl + $"/{GameServerID}"; } }
 
-        private string DisplayWelcomeMessage(Player p)
-        {
-            string welcomeString = Environment.NewLine
-                + "CARDS AGAINST HUMANITY\n"
-                + "-----------------------\n"
-                + $"Welkom {p.Name} (ID: {p.ID})\n";
-
-            return welcomeString;
-        }
+        
         private string ShowPlayersInGame(Dictionary<GameServer, IPlayer> players)
         {
             string playersInGame = $"Spelers:\n";
@@ -73,7 +66,10 @@ namespace Websocket_Server
             {
                 Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
                 Lobby.Instance.GameServerWithPlayers.Add(this, playerWaitingForGame);
-                Send(DisplayWelcomeMessage(playerWaitingForGame));
+
+                var welcomeMessage = JsonSerializer.Serialize(new WelcomeMessage(playerWaitingForGame));
+
+                Send(welcomeMessage);
             }
 
             Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
