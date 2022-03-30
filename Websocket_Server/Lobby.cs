@@ -9,19 +9,19 @@ using WebSocketSharp;
 
 namespace Websocket_Server
 {
-    public class Lobby
+    public class Lobby 
     {
-        public Dictionary<GameServer, IPlayer> GameServerWithPlayers = new Dictionary<GameServer, IPlayer>();
 
-        public int NumberOfPlayersForGame
-        {
-            get { return 3; }
-            set { NumberOfPlayersForGame = value; }
-        }
+        private Dictionary<Game, GameServer> _gamesWithGameServer = new Dictionary<Game, GameServer>();
+        private Dictionary<IPlayer, Game> _playersWithGame = new Dictionary<IPlayer, Game>();
 
-        public bool GameIsFull //Moet per server worden bekeken
+        public List<GameServer> gameservers = new List<GameServer>();
+        public List<Game> games = new List<Game>();
+        public List<IPlayer> players = new List<IPlayer>();
+
+        public bool GameIsFull 
         {
-            get { return GameServerWithPlayers.Values.Count == NumberOfPlayersForGame ? true : false; }
+            get { return false; } //TODO - Moet bekeken worden per spel op de gameserver
         }
 
         private Lobby() { }

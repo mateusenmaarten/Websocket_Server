@@ -14,29 +14,28 @@ namespace Websocket_Server
 {
     public class GameServer : WebSocketBehavior
     {
-        const string baseGameServerUrl = "ws://localhost:4200/CardsAgainstHumanity";
+        //Gameserver managed meerdere games op 1 websocket.
+        private string _baseGameServerUrl = Constants.GameURL;
         private Dictionary<WebSocket,IGamePlayer> _gamePlayers = new Dictionary<WebSocket,IGamePlayer>();
 
-        public GameServer()
+        public GameServer() 
         {
-          GameServerID = Guid.NewGuid();
-          WebSocketServer wss = new WebSocketServer(baseGameServerUrl);
-          wss.AddWebSocketService<GameServer>($"/{GameServerID}");
-          wss.Start();
+
         }
 
         public Guid GameServerID { get; set; }
-        public string URL { get { return baseGameServerUrl + $"/{GameServerID}"; } }
+        public Guid Id { get; set; }
+        public string Url { get; set; } 
+        public int MaxNumberOfGamesOnServer { get; set; } = 2;
 
-        
-        private string ShowPlayersInGame(Dictionary<GameServer, IPlayer> players)
+        private string ShowPlayersInGame(IDictionary<IPlayer, GameServer> players)
         {
             string playersInGame = $"Spelers:\n";
             foreach (var player in players)
             {
-                if (player.Key.GameServerID == this.GameServerID)
+                if (player.Value.GameServerID == this.GameServerID)
                 {
-                    playersInGame += $" -> { player.Value.Name}\n";
+                    playersInGame += $" -> { player.Key.Name}\n";
                 }
             }
 
@@ -65,20 +64,20 @@ namespace Websocket_Server
             if (e.Data != null)
             {
                 Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
-                Lobby.Instance.GameServerWithPlayers.Add(this, playerWaitingForGame);
+                Lobby.Instance.GameServerWithPlayers.Add(playerWaitingForGame, this);
 
                 var welcomeMessage = JsonSerializer.Serialize(new WelcomeMessage(playerWaitingForGame));
 
                 Send(welcomeMessage);
             }
 
-            Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
+            //Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
 
             if (Lobby.Instance.GameIsFull)
             {
                 GameManager gameManager = CreateGame();
 
-                Sessions.Broadcast(ShowPlayersInGame(Lobby.Instance.GameServerWithPlayers));
+                Sessions.Broadcast(ShowPlayersInGame(Lobby.Instance._playersWithGame));
 
                 DisplayOpeningHands(gameManager, _gamePlayers);
 
@@ -109,6 +108,8 @@ namespace Websocket_Server
             GameFactory gameFactory = new GameFactory();
        
             Game game = gameFactory.CreateGame(_gamePlayers.Values);
+            //Set Game ID to ID from game URL ID
+            //Create game with dummy players and replace them when new players arrive?
             GameManager gameManager = game.GameManager;
 
             gameManager.StartGame();

@@ -1,17 +1,12 @@
 ﻿using CAH.Backend.Classes;
 using CAH.Backend.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+
 
 namespace Websocket_Server
 {
     public abstract class GameMessage
     {
-        public abstract string Message{ get; }
         public abstract string MessageType { get; }
         public abstract MessageRouting Routing { get; }
 
@@ -36,6 +31,16 @@ namespace Websocket_Server
 
     }
 
+    public abstract class ModeSelectionMessage : GameMessage
+    {
+        public ModeSelectionMessage() : base()
+        {
+            
+        }
+        
+
+    }
+
     public enum MessageRouting
     {
         ServerToPlayer,
@@ -45,8 +50,9 @@ namespace Websocket_Server
 
     public class UserUpdateNameMessage : GameMessage
     {
-        public UserUpdateNameMessage() : base()
+        public UserUpdateNameMessage(string name) : base()
         {
+            Name = name;
         }
 
         public string Name { get; }
@@ -54,6 +60,7 @@ namespace Websocket_Server
         public override string MessageType => nameof(UserUpdateNameMessage);
 
         public override MessageRouting Routing => MessageRouting.PlayerToServer;
+
     }
 
     public class WelcomeMessage : SinglePlayerMessage
@@ -67,7 +74,7 @@ namespace Websocket_Server
 
         public override MessageRouting Routing => MessageRouting.ServerToPlayer;
 
-        public override string Message 
+        public string Message 
         {
             get
             {
@@ -83,20 +90,22 @@ namespace Websocket_Server
 
     public class PlayWhiteCardMessage : SinglePlayerMessage
     {
-        public PlayWhiteCardMessage(IGamePlayer player) : base(player)
+        public PlayWhiteCardMessage(IPlayer player, string cardID) : base(player)
         {
+            CardID = cardID;
         }
 
-        public int CardID { get; }
+        public string CardID { get; }
 
         public override string MessageType => nameof(PlayWhiteCardMessage);
 
         public override MessageRouting Routing => MessageRouting.PlayerToServer;
+
     }
 
     public class DealWhiteCardMessage : SinglePlayerMessage
     {
-        public DealWhiteCardMessage(IGamePlayer player, WhiteCard[] playerCards) : base(player)
+        public DealWhiteCardMessage(IPlayer player, WhiteCard[] playerCards) : base(player)
         {
             PlayerCards = playerCards;
         }
