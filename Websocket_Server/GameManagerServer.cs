@@ -6,7 +6,7 @@ using WebSocketSharp.Server;
 
 namespace Websocket_Server
 {
-    public class GameManagerServer : WebSocketBehavior
+    public partial class GameManagerServer : WebSocketBehavior
     {
         private WebSocketServer websocketserver;
         private GameServer? gameServer = null;
@@ -44,12 +44,6 @@ namespace Websocket_Server
             {
                 Send("Please select a valid option.");
             }
-        }
-
-        public enum GameOption : int
-        {
-            NewGame = 1, 
-            JoinGame = 2
         }
 
         public string CreateNewGameOnServer()
