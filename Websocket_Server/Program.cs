@@ -4,7 +4,7 @@ using WebSocketSharp.Server;
 
 WebSocketServer wss = new WebSocketServer(Constants.URL);
 
-wss.AddWebSocketService<GameManagerServer>(Constants.GameURL);
+wss.AddWebSocketService<GameServerManager>(Constants.GameURL);
 
 wss.Start();
 
