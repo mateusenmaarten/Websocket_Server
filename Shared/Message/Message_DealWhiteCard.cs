@@ -3,16 +3,16 @@
 
 namespace Websocket_Server
 {
-    public class DealWhiteCardMessage : Message
+    public class Message_DealWhiteCard : Message
     {
-        public DealWhiteCardMessage(IPlayer player, WhiteCard[] playerCards) : base()
+        public Message_DealWhiteCard(IPlayer player, WhiteCard[] playerCards) : base()
         {
             PlayerCards = playerCards;
         }
 
         public WhiteCard[] PlayerCards { get; }
 
-        public override string MessageType => nameof(DealWhiteCardMessage);
+        public override string MessageType => nameof(Message_DealWhiteCard);
 
         public override MessageRouting Routing => MessageRouting.ServerToPlayer;
     }

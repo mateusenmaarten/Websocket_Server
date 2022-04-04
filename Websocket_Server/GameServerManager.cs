@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAH.Backend.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using WebSocketSharp;
@@ -42,6 +43,11 @@ namespace Websocket_Server
             //    Send(gameServer.URL);
             //}
             return new List<Game>();
+        }
+
+        public static GameServer AddPlayerToGame(IPlayer player, Game game)
+        {
+            return new GameServer(); //server where the game is active.
         }
     }
 }

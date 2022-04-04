@@ -1,15 +1,15 @@
 ﻿namespace Websocket_Server
 {
-    public class LoginMessage : Message
+    public class Message_Login : Message
     {
-        public LoginMessage(string name) : base()
+        public Message_Login(string name) : base()
         {
             Name = name;
         }
 
         public string Name { get; }
 
-        public override string MessageType => nameof(LoginMessage);
+        public override string MessageType => nameof(Message_Login);
 
         public override MessageRouting Routing => MessageRouting.PlayerToServer;
 

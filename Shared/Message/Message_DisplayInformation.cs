@@ -1,13 +1,13 @@
 ﻿namespace Websocket_Server
 {
-    public class InfoMessage : Message
+    public class Message_DisplayInformation : Message
     {
-        public InfoMessage() : base()
+        public Message_DisplayInformation() : base()
         {
             
         }
 
-        public override string MessageType => nameof(InfoMessage);
+        public override string MessageType => nameof(Message_DisplayInformation);
 
         public override MessageRouting Routing => MessageRouting.ServerToPlayer;
 

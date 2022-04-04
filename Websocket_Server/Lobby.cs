@@ -11,7 +11,7 @@ using WebSocketSharp.Server;
 
 namespace Websocket_Server
 {
-    public class Lobby : WebSocketBehavior
+    public class Lobby : WebSocketBehavior  //Ontvangt speler en stuurt deze naar een spel via de GameManagerServer
     {
 
         private Dictionary<Game, GameServer> _gamesWithGameServer = new Dictionary<Game, GameServer>();
@@ -28,7 +28,7 @@ namespace Websocket_Server
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            var incomingMessage = JsonSerializer.Deserialize<LoginMessage>(e.Data);
+            var incomingMessage = JsonSerializer.Deserialize<Message_Login>(e.Data);
             List<MainMenuOption> validOptions = new List<MainMenuOption>() { MainMenuOption.NewGame, MainMenuOption.JoinGame };
 
             MainMenuOption chosenOptionEnum = Enum.Parse<MainMenuOption>(incomingMessage.Name);
@@ -40,7 +40,7 @@ namespace Websocket_Server
                 switch (chosenOptionEnum)
                 {
                     case MainMenuOption.NewGame:
-                        string gameServerUrl = CreateNewGameOnServer();
+                        string gameServerUrl = GameServerManager.CreateNewGameOnServer();
                         Send(gameServerUrl);
                         break;
                     case MainMenuOption.JoinGame:
@@ -56,10 +56,13 @@ namespace Websocket_Server
                 Send("Please select a valid option.");
             }
         }
-        public void SendPlayerToRequestedGame(Guid id)
+        public void SendPlayerToRequestedGame(Guid id, IPlayer player)
         {
-            var url = Constants.CreateGameUrl(id);
-            Send(url);
+            List<Game> activeGames = GameServerManager.GetActiveGamesOnAllServers();
+            var game = activeGames.Where(x => x.ID == id).FirstOrDefault();
+            if (game == null || player == null) throw new NullReferenceException("Cannot send player to requested game");
+            GameServer gameserver = GameServerManager.AddPlayerToGame(player, game);
+            var url = $"{gameserver.Url}/{game.ID}"; 
         }
 
         private Lobby() { }
