@@ -3,10 +3,8 @@ using CAH.Backend.Factories;
 using CAH.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Websocket_Shared;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -64,11 +62,11 @@ namespace Websocket_Server
             if (e.Data != null)
             {
                 Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
-                Lobby.Instance.GameServerWithPlayers.Add(playerWaitingForGame, this);
+                //Lobby.Instance.GameServerWithPlayers.Add(playerWaitingForGame, this);
 
-                var welcomeMessage = JsonSerializer.Serialize(new WelcomeMessage(playerWaitingForGame));
+                //var welcomeMessage = JsonSerializer.Serialize(new WelcomeMessage(playerWaitingForGame));
 
-                Send(welcomeMessage);
+                //Send(Message_Login);
             }
 
             //Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
@@ -77,7 +75,7 @@ namespace Websocket_Server
             {
                 GameManager gameManager = CreateGame();
 
-                Sessions.Broadcast(ShowPlayersInGame(Lobby.Instance._playersWithGame));
+                //Sessions.Broadcast(ShowPlayersInGame(Lobby.Instance._playersWithGame));
 
                 DisplayOpeningHands(gameManager, _gamePlayers);
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Websocket_Shared;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -40,11 +41,11 @@ namespace Websocket_Server
                 switch (chosenOptionEnum)
                 {
                     case MainMenuOption.NewGame:
-                        string gameServerUrl = GameServerManager.CreateNewGameOnServer();
-                        Send(gameServerUrl);
+                        //string gameServerUrl = GameServerManager.CreateNewGameOnServer();
+                        //Send(gameServerUrl);
                         break;
                     case MainMenuOption.JoinGame:
-                        SendListOfActiveGamesOnAllServers();
+                        //SendListOfActiveGamesOnAllServers();
                         break;
                     default:
                         Send("Please select a valid option.");

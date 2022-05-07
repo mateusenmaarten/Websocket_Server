@@ -12,31 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="CAH.Backend">
-      <HintPath>libs\CAH.Backend.dll</HintPath>
+      <HintPath>..\..\Websocket_Shared\Websocket_Shared\bin\Debug\net6.0\CAH.Backend.dll</HintPath>
     </Reference>
     <Reference Include="CAH.Data">
-      <HintPath>libs\CAH.Data.dll</HintPath>
+      <HintPath>..\..\Websocket_Shared\Websocket_Shared\bin\Debug\net6.0\CAH.Data.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="libs\CAH.Backend.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="libs\CAH.Data.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TextFiles\Answers.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TextFiles\Questions.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Reference Include="Websocket_Shared">
+      <HintPath>..\..\Websocket_Shared\Websocket_Shared\bin\Debug\net6.0\Websocket_Shared.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
