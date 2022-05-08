@@ -17,11 +17,11 @@ namespace Websocket_Server
         {
             //CREATE NEW GAME WITH DUMMY PLAYERS TO USE THE GAMEID AS URL ID, replace players at arrival
             Guid gameGuid = new Guid();
-            string gameUrl = Constants.CreateGameUrl(gameGuid);
+            //string gameUrl = Constants.CreateGameUrl(gameGuid);
 
             var gamewss = new WebSocketServer();
 
-            gamewss.AddWebSocketService<GameServer>(gameUrl);
+            //gamewss.AddWebSocketService<GameServer>(gameUrl);
 
             if (gameserver == null) throw new Exception();
 

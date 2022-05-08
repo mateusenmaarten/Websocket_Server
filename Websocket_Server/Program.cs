@@ -4,7 +4,7 @@ using WebSocketSharp.Server;
 
 WebSocketServer wss = new WebSocketServer(Constants.URL);
 
-wss.AddWebSocketService<GameServer>(Constants.GameURL);
+wss.AddWebSocketService<GameServer>("/CardsAgainstHumanity");
 
 wss.Start();
 
@@ -18,7 +18,5 @@ public static class Constants
     public static int MANAGERPORT = 4200;
     public static int CLIENTPORT = 4201;
     public static string URL => $"ws://localhost:{MANAGERPORT}";
-    public static string GameURL => "/CardsAgainstHumanity";
-
-    public static string CreateGameUrl(Guid guid) => $"ws://localhost:{CLIENTPORT}{GameURL}/{guid.ToString()}";
+    public static string GameURL => $"{URL}/CardsAgainstHumanity";
 }

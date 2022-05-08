@@ -16,11 +16,6 @@ namespace Websocket_Server
         private string _baseGameServerUrl = Constants.GameURL;
         private Dictionary<WebSocket,IGamePlayer> _gamePlayers = new Dictionary<WebSocket,IGamePlayer>();
 
-        public GameServer() 
-        {
-
-        }
-
         public Guid GameServerID { get; set; }
         public Guid Id { get; set; }
         public string Url { get; set; } 
@@ -58,15 +53,29 @@ namespace Websocket_Server
         protected override void OnMessage(MessageEventArgs e)
         {
             WebSocket websocket = Context.WebSocket;
-
+            
             if (e.Data != null)
             {
-                Player playerWaitingForGame = CreatePlayer(e.Data, websocket);
+                var message = JsonSerializer.Deserialize<RawMessage>(e.Data);
+
+                var messageType = message.MessageType;
+
+                switch (messageType)
+                {
+                    case "Message_Login":
+                        var loginMessage = JsonSerializer.Deserialize<Message_Login>(message.MessageContent);
+                        Lobby.Instance.WelcomePlayer(loginMessage.Name, websocket);
+                        break;
+                    default:
+                        break;
+                }
+
+
                 //Lobby.Instance.GameServerWithPlayers.Add(playerWaitingForGame, this);
 
-                //var welcomeMessage = JsonSerializer.Serialize(new WelcomeMessage(playerWaitingForGame));
+                //var welcomeMessage = JsonSerializer.Serialize(new Message_Login(playerWaitingForGame));
 
-                //Send(Message_Login);
+                //Send(welcomeMessage);
             }
 
             //Sessions.Broadcast($"Wachten op spelers ({...}/{...})");
@@ -84,15 +93,12 @@ namespace Websocket_Server
             }
         }
 
-        Player CreatePlayer(string playerName, WebSocket websocket)
+        private void HandleMessage(string data)
         {
-            Player playerWaitingForGame = new Player();
-
-            playerWaitingForGame.Name = playerName;
-            playerWaitingForGame.ID = Guid.Parse(ID);
-
-            return playerWaitingForGame;
+            
         }
+
+
         GamePlayer CreateGamePlayer(WebSocket websocket, IPlayer player)
         {
             GamePlayer gp = new GamePlayer(player);
